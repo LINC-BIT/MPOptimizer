@@ -1,0 +1,1 @@
+docker build --build-arg clang_version=14 -t clang:14 -f clang.Dockerfile .
