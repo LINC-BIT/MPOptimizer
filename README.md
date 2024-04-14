@@ -14,11 +14,13 @@ typora-copy-images-to: ./images
 
 The following model support is now available：
 
-- [ResNet](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html): this model consists of multiple convolutional layers and pooling layers that extract the information in image. Typically, ResNet suffers from gradient vanishing (exploding) and performance degrading when the network is deep. ResNet thus adds BatchNorm to alleviate gradient vanishing (exploding) and adds residual connection to alleviate the performance degrading.
+- [ResNet](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html): This model consists of multiple convolutional layers and pooling layers that extract the information in image. Typically, ResNet suffers from gradient vanishing (exploding) and performance degrading when the network is deep. ResNet thus adds BatchNorm to alleviate gradient vanishing (exploding) and adds residual connection to alleviate the performance degrading.
 
 - [MobileNet](https://arxiv.org/abs/1801.04381): MobileNet is a lightweight convolutional network which widely uses the depthwise separable convolution.
 - [ResNeXt](https://arxiv.org/abs/1611.05431): ResNeXt combines Inception and ResNet. It first simplifies the Inception Module to make each of its branch have the same structure and then constructs the network as ResNet-style.
 - [MobileViT](https://github.com/chinhsuanwu/mobilevit-pytorch):MobileviT is a lightweight, general-purpose visualization transformer for mobile devices.
+- [DenseNet](https://arxiv.org/pdf/1608.06993.pdf):The core feature of DenseNet is its unique dense connectivity mechanism, which enables each layer in the network to connect directly or indirectly to all other layers, thus making full use of the feature information.
+- [CLIP](https://github.com/OpenAI/CLIP):CLIP (Contrastive Language-Image Pre-Training) is a neural network trained on a variety of (image, text) pairs. It can be instructed in natural language to predict the most relevant text snippet, given an image, without directly optimizing for the task, similarly to the zero-shot capabilities of GPT-2 and 3. 
 
 ## 2 How to get started
 
@@ -88,16 +90,24 @@ Arguments:
 
 ## 3 Supported models
 
-|      |                          Model Name                          |                          Data                          |                            Script                            |
-| ---- | :----------------------------------------------------------: | :----------------------------------------------------: | :----------------------------------------------------------: |
-| ☑    | [MobileViT (ICLR'22)](https://github.com/chinhsuanwu/mobilevit-pytorch) | [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html) | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/MobileViT/re_train.py) |
-| ☑    | [ResNet (CVPR'2016)](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html) | [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html) | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/ResNet/re_train.py) |
-| ☑    | [MobileNetV2 (CVPR'2018)](https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html) | [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html) | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/MobileNet/re_train.py) |
-| ☑    | [ResNeXt (CVPR'2017)](https://openaccess.thecvf.com/content_cvpr_2017/html/Xie_Aggregated_Residual_Transformations_CVPR_2017_paper.html) | [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html) | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/ResNet/re_train.py) |
+|      |                          Model Name                          |                             Data                             |                            Script                            |
+| ---- | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+| ☑    | [MobileViT (ICLR'22)](https://github.com/chinhsuanwu/mobilevit-pytorch) |    [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html)    | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/MobileViT/re_train.py) |
+| ☑    | [ResNet (CVPR'2016)](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html) |    [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html)    | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/ResNet/re_train.py) |
+| ☑    | [MobileNetV2 (CVPR'2018)](https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html) |    [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html)    | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/MobileNet/re_train.py) |
+| ☑    | [ResNeXt (CVPR'2017)](https://openaccess.thecvf.com/content_cvpr_2017/html/Xie_Aggregated_Residual_Transformations_CVPR_2017_paper.html) |    [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html)    | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/ResNet/re_train.py) |
+| ☑    |       [DenseNet](https://arxiv.org/pdf/1608.06993.pdf)       |    [Cifar100](http://www.cs.toronto.edu/~kriz/cifar.html)    | [Demo](https://github.com/LINC-BIT/MPOptimizer/model/ResNet/re_train.py) |
+| ☑    |            [CLIP](https://github.com/OpenAI/CLIP)            | [GTA5](https://link.springer.com/chapter/10.1007/978-3-319-46475-6_7) | [Demo](https://github.com/LINC-BIT/MPOptimizer/BIG_model/new_impl/cv/clip/clip.py) |
 
 ## 4 Implementation
 
-### 4.1 Resource Profiling Algorithm
+### 4.1 Memory-related Hyperparameters Extraction
+
+![memory_hyperparameters](images/memory_hyperparameters.png)
+
+MPOptimizer integrates three techniques (microbatch, parameter freezing, and gradient checkpoints) in a unified model and sets up a scheme that allows for dynamic adjustment of these techniques. We call them memory-related hyperparameters, and the figure above shows the memory-related hyperparameters for each technique, allowing the user to choose whether to adjust them manually or to use the automated search scheme we have implemented.
+
+### 4.2 Resource Profiling Algorithm
 
 Our target retraining tasks are configured based on existing pre-training data. Therefore, how to efficiently use the resource consumption data obtained in the pre-training phase to estimate the online resource consumption in the re-training phase is the main problem we need to solve. To this end, we designed algorithms for resource profiling to complete rapid estimation of online resources.
 
@@ -133,7 +143,7 @@ Our target retraining tasks are configured based on existing pre-training data. 
                     f" Total Allocated Memory:{self.get_allocate_usage():<7.1f}Mb\n\n")
 ```
 
-### 4.2 Accuracy Improvement Algorithm
+### 4.3 Accuracy Improvement Algorithm
 
 When performing memory hyperparameter search, traditional methods generally do not consider the impact of hyperparameters on model training accuracy. However, for online unsupervised retraining tasks whose training itself is very unstable, this may cause rapid loss of accuracy and worse training results. To this end, we propose an accuracy improvement algorithm that searches for memory hyperparameters while ensuring that a hyperparameter configuration with higher accuracy improvement efficiency is selected.
 
@@ -313,6 +323,12 @@ python estimator/gpu_mem_track.py
 python estimator/accuracy_estimator.py
 ```
 
+##### 5.1.4 Evaluation of the effectiveness of memory optimization
+
+<img src="images/memory_cost.png" alt="memory_cost" style="zoom:50%;" />
+
+While training the model, we get the memory optimization strength of the different techniques by looking at the TensorBoard, and the figure shows the leading optimization performance of the integrated control module MIC in MPOptimizer.
+
 #### 5.2 Transfer learning tasks
 
 ##### 5.2.1 Dataset introduction
@@ -379,4 +395,41 @@ python src/re_train.py
 ```
 python src/re_test_svnh.py
 ```
+
+#### 5.4 Big model
+
+We implemented a memory optimization support work for large models in Hugging Face based on the prior work EdgeTA. Including Vision Transformer, CLIP, SAM, GLIP, GPT-Neo and so on. Among them, the pre-training time of CLIP is shorter, so it is easy for users to test, here we focus on the running process of this work, and the rest of the work users can refer to the directory file to test by themselves.
+
+- Experimental settings
+
+**Models.** We use a image classification model based on CLIP from Hugging Face as an example to explain how to connect a Hugging Face FM to the MPO p ti mi ze r.
+
+**Datasets.** We use datasets [GTA5](https://link.springer.com/chapter/10.1007/978-3-319-46475-6_7) and [SuperviselyPerson](https://supervise.ly/) as the source domain, and datasets [Cityscapes](https://openaccess.thecvf.com/content_cvpr_2016/html/Cordts_The_Cityscapes_Dataset_CVPR_2016_paper.html) and [BaiduPerson](https://ieeexplore.ieee.org/abstract/document/6976983) as the target domain. We convert these semantic segmentation datasets into image classification datasets by cropping and saving the images in the segmentation bounding boxes.
+
+- Front-end pre-training work
+
+Run the following command sequentially to pre-train the knowledge base and index:
+
+```shell
+python Big_model/new_impl/cv/clip/cls.py
+python Big_model/new_impl/cv/clip/cls_md_wo_fbs.py
+python Big_model/new_impl/cv/clip/cls_md_index.py
+//Note that the file path of the model checkpoint in last two files should be modified manually.
+```
+
+- Online retraining phase
+
+Run the following command to evaluate MPOptimizer over evolving data::
+
+```shell
+python estimator/gpu_mem_track.py
+python estimator/accuracy_estimator.py
+python Big_model/new_impl/cv/clip/cls_online.py
+```
+
+
+
+
+
+
 

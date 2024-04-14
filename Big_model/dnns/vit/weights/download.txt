@@ -1,0 +1,1 @@
+download the weight from https://huggingface.co/timm/vit_base_patch16_224.augreg2_in21k_ft_in1k/tree/main
