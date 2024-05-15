@@ -95,7 +95,13 @@ python MPOptimizer/src/test.py --dataset [dataset] --model [model]
 
 ## 4 部署
 
-### 4.1 资源剖析算法
+### 4.1 内存相关超参数提取
+
+![image-20240515100255433](images/image-20240515100255433.png)
+
+MPOptimizer 将三种技术（微批处理、参数冻结和梯度检查点）整合到一个统一的模型中，并设置了一个允许动态调整这些技术的方案。它们被称为内存相关超参数，上图显示了每种技术的内存相关超参数，用户可以选择是手动调整还是使用MPOptimizer实现的自动搜索方案。
+
+### 4.2 资源剖析算法
 
 针对的目标重训练任务是基于已有预训练数据配置的。因此，如何有效利用预训练阶段获得的资源消耗数据来估算再训练阶段的在线资源消耗是MPOptimizer需要解决的主要问题。为此，MPOptimizer实现了资源剖析算法，以完成在线资源的快速估算。
 
@@ -131,7 +137,7 @@ python MPOptimizer/src/test.py --dataset [dataset] --model [model]
                     f" Total Allocated Memory:{self.get_allocate_usage():<7.1f}Mb\n\n")
 ```
 
-### 4.2 精度增益算法
+### 4.3 精度增益算法
 
 在进行内存相关超参数搜索时，传统方法一般不会考虑超参数对模型训练精度的影响。然而，对于训练本身非常不稳定的在线无监督重训练任务来说，这可能会导致准确率迅速下降，使训练结果变差。为此，MPOptimizer实现了一种精度增益算法，它在搜索内存相关超参数的同时，确保选择精度改进效率更高的超参数配置。
 
@@ -379,4 +385,35 @@ python src/re_train.py
 ```
 python src/re_test_svnh.py
 ```
+
+#### 5.4 图像分割大模型
+
+MPOptimizer在先前工作 EdgeTA 的基础上，在 Hugging Face 中对大型模型实施了内存优化支持工作。包括 Vision Transformer、CLIP、SAM、GLIP、GPT-Neo 等。其中，CLIP 的预训练时间较短，便于用户测试，这里重点介绍该工作的运行过程，其余工作用户可参考目录文件自行测试。
+
+- 实验设置
+
+**模型**。以 Hugging Face 中基于 CLIP 的图像分类模型为例，说明如何将 Hugging Face FM 与 MPOptimizer 连接起来。
+
+**数据集。** 我们使用数据集 [GTA5](https://link.springer.com/chapter/10.1007/978-3-319-46475-6_7) 和 [SuperviselyPerson](https://supervise.ly/) 作为源域，使用数据集 [Cityscapes](https://openaccess.thecvf.com/content_cvpr_2016/html/Cordts_The_Cityscapes_Dataset_CVPR_2016_paper.html) 和 [BaiduPerson](https://ieeexplore.ieee.org/abstract/document/6976983) 作为目标域。我们通过裁剪和保存分割边界框中的图像，将这些语义分割数据集转换为图像分类数据集。
+
+- 前端预训练工作
+
+依次运行以下命令，对知识库和索引进行预训练：
+
+`````shell
+python Big_model/new_impl/cv/clip/cls.py
+python Big_model/new_impl/cv/clip/cls_md_wo_fbs.py
+python Big_model/new_impl/cv/clip/cls_md_index.py
+//Note that the file path of the model checkpoint in last two files should be modified manually.
+`````
+
+- 在线重训练阶段
+
+运行以下命令，对 MPOptimizer 在不断变化的数据中的表现进行评估：
+
+``````
+python estimator/gpu_mem_track.py
+python estimator/accuracy_estimator.py
+python Big_model/new_impl/cv/clip/cls_online.py
+``````
 

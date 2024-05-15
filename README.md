@@ -402,7 +402,7 @@ We implemented a memory optimization support work for large models in Hugging Fa
 
 - Experimental settings
 
-**Models.** We use a image classification model based on CLIP from Hugging Face as an example to explain how to connect a Hugging Face FM to the MPO p ti mi ze r.
+**Models.** We use a image classification model based on CLIP from Hugging Face as an example to explain how to connect a Hugging Face FM to the MPOptimizer.
 
 **Datasets.** We use datasets [GTA5](https://link.springer.com/chapter/10.1007/978-3-319-46475-6_7) and [SuperviselyPerson](https://supervise.ly/) as the source domain, and datasets [Cityscapes](https://openaccess.thecvf.com/content_cvpr_2016/html/Cordts_The_Cityscapes_Dataset_CVPR_2016_paper.html) and [BaiduPerson](https://ieeexplore.ieee.org/abstract/document/6976983) as the target domain. We convert these semantic segmentation datasets into image classification datasets by cropping and saving the images in the segmentation bounding boxes.
 
@@ -419,7 +419,7 @@ python Big_model/new_impl/cv/clip/cls_md_index.py
 
 - Online retraining phase
 
-Run the following command to evaluate MPOptimizer over evolving data::
+Run the following command to evaluate MPOptimizer over evolving data:
 
 ```shell
 python estimator/gpu_mem_track.py
